@@ -26,29 +26,35 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="product-pic-zoom">
-                                    <img class="product-big-img" :src="gambar_default" alt="" />
+                                    <!-- <img class="product-big-img" :src="gambar_default" alt="" /> -->
+                                    <img v-bind:src="'http://127.0.0.1:8001/storage/'+productDetails.photo"
+                                        alt="http://127.0.0.1:8001/storage/assets/product/JRFqqbwOzKIbYVFiI9TV1HPnkpXNg8Fjcd5qhpuD.jpg">
                                 </div>
                                 <div class="product-thumbs">
                                     <carousel class="product-thumbs-track ps-slider" :items="3" :nav="false"
                                         :margin="8">
                                         <div class="pt" @click="(changeImage(thumbs[0]))"
                                             :class="thumbs[0] == gambar_default ? 'active' : 'nonactive'">
-                                            <img src="img/products/women-1.jpg" alt="" />
+                                            <!-- <img src="img/products/women-1.jpg" alt="" /> -->
+                                            <img v-bind:src="'http://127.0.0.1:8001/storage/'+productDetails.photo">
                                         </div>
 
                                         <div class="pt" @click="(changeImage(thumbs[1]))"
                                             :class="thumbs[1] == gambar_default ? 'active' : 'nonactive'">
-                                            <img src="img/products/women-2.jpg" alt="" />
+                                            <!-- <img src="img/products/women-2.jpg" alt="" /> -->
+                                            <img v-bind:src="'http://127.0.0.1:8001/storage/'+productDetails.photo">
                                         </div>
 
                                         <div class="pt" @click="(changeImage(thumbs[2]))"
                                             :class="thumbs[2] == gambar_default ? 'active' : 'nonactive'">
-                                            <img src="img/products/women-3.jpg" alt="" />
+                                            <!-- <img src="img/products/women-3.jpg" alt="" /> -->
+                                            <img v-bind:src="'http://127.0.0.1:8001/storage/'+productDetails.photo">
                                         </div>
 
                                         <div class="pt" @click="(changeImage(thumbs[3]))"
                                             :class="thumbs[3] == gambar_default ? 'active' : 'nonactive'">
-                                            <img src="img/products/women-4.jpg" alt="" />
+                                            <!-- <img src="img/products/women-4.jpg" alt="" /> -->
+                                            <img v-bind:src="'http://127.0.0.1:8001/storage/'+productDetails.photo">
                                         </div>
                                     </carousel>
                                 </div>
@@ -56,8 +62,8 @@
                             <div class="col-lg-6 text-left">
                                 <div class="product-details">
                                     <div class="pd-title">
-                                        <span>oranges</span>
-                                        <h3>Pure Pineapple</h3>
+                                        <span>{{productDetails.type}}</span>
+                                        <h3>{{productDetails.name}}</h3>
                                     </div>
                                     <div class="pd-desc">
                                         <p>
@@ -87,11 +93,12 @@
                                             velit
                                             architecto?
                                         </p>
-                                        <h4>$495.00</h4>
+                                        <h4>${{productDetails.price}}</h4>
                                     </div>
                                     <div class="quantity">
                                         <router-link to="/cart">
-                                            <a href="shopping-cart.html" class="primary-btn pd-cart">Add To Cart</a>
+                                            <a @click="saveKeranjang(productDetails.products_id, productDetails.name, productDetails.price, productDetails.photo)"
+                                                href="#" class="primary-btn pd-cart">Add To Cart</a>
                                         </router-link>
                                     </div>
                                 </div>
@@ -112,6 +119,7 @@ import HeaderVue from '@/components/HeaderVue.vue';
 import FooterVue from '@/components/FooterVue.vue';
 import carousel from 'vue-owl-carousel';
 import RelatedProduct from '@/components/RelatedProduct.vue';
+import axios from 'axios';
 
 
 export default {
@@ -124,19 +132,57 @@ export default {
     },
     data() {
         return {
-            gambar_default: "img/products/women-1.jpg",
+            gambar_default: "",
             thumbs: [
                 "img/products/women-1.jpg",
                 "img/products/women-2.jpg",
                 "img/products/women-3.jpg",
                 "img/products/women-4.jpg"
-            ]
+            ],
+            productDetails: [],
+            keranjangUser: []
         }
     },
     methods: {
         changeImage(urlImage) {
-            this.gambar_default = urlImage
+            this.gambar_default = urlImage;
+        },
+        setDataPicture(data) {
+            this.productDetails = data;
+            this.gambar_default = 'img/products/' + data.name + '.jpg'
+        },
+        saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct) {
+
+            var productStored = {
+                "id": idProduct,
+                "name": nameProduct,
+                "price": priceProduct,
+                "photo": 'http://127.0.0.1:8001/storage/' + photoProduct
+            }
+
+            this.keranjangUser.push(productStored);
+            const parsed = JSON.stringify(this.keranjangUser);
+            localStorage.setItem('keranjangUser', parsed);
         }
+    },
+    mounted() {
+        if (localStorage.getItem('keranjangUser')) {
+            try {
+                this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+            } catch (e) {
+                localStorage.removeItem('keranjangUser');
+            }
+        }
+
+        axios
+            .get("http://127.0.0.1:8001/api/products", {
+                params: {
+                    id: this.$route.params.id
+                }
+            })
+            // .then(res => (this.productDetails = res.data.data))
+            .then(res => (this.setDataPicture(res.data.data)))
+            .catch(err => console.log(err));
     }
 }
 </script>
