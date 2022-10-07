@@ -1,5 +1,6 @@
 # Description
-Ini merupakan repository untuk belajar Vue-Js dengan membuat project toko online dengan Vue-Js sebagai Front End dan Laravel sebagai Back End
+Ini merupakan repository untuk belajar Vue-Js dengan membuat project toko online dengan Vue-Js sebagai Front End dan Laravel sebagai Back End dan Tampilan Admin
+Link Backend Repository = https://github.com/fajarajiprayoga/tokoonline-laravel
 
 # Fitur yang tersedia pada aplikasi
 - Single Page Application (SPA)
